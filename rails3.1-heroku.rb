@@ -1,20 +1,19 @@
-puts "-----------------------------------------------------------------------"
-puts "Rails Application Template for Heroku Cedar"
-puts "-----------------------------------------------------------------------"
+def put_header header
+  puts "-----------------------------------------------------------------------"
+  puts header
+  puts "-----------------------------------------------------------------------"
+end
 
+put_header "Rails Application Template for Heroku Cedar"
 app_name = ask("What do you want to call your Heroku app?")
 
-puts "-----------------------------------------------------------------------"
-puts "Remove unneeded files"
-puts "-----------------------------------------------------------------------"
+put_header "Remove unneeded files"
 run 'rm public/index.html'
 run 'rm app/assets/images/rails.png'
 run 'rm README'
 run 'touch README'
 
-puts "-----------------------------------------------------------------------"
-puts "Create Gemfile"
-puts "-----------------------------------------------------------------------"
+put_header "Create Gemfile"
 run 'rm Gemfile'
 create_file 'Gemfile', <<HERE
 source 'http://rubygems.org'
@@ -30,14 +29,10 @@ group :assets do
 end
 HERE
 
-puts "-----------------------------------------------------------------------"
-puts "Create Procfile"
-puts "-----------------------------------------------------------------------"
+put_header "Create Procfile"
 create_file 'Procfile', "web: bundle exec rails server thin -p $PORT"
 
-puts "-----------------------------------------------------------------------"
-puts "Create database config"
-puts "-----------------------------------------------------------------------"
+put_header "Create database config"
 run 'rm config/database.yml'
 create_file 'config/database.yml', <<HERE
 development:
@@ -45,17 +40,15 @@ development:
   database: #{app_name}_development
   host: localhost
   encoding: utf8
-  
+
 test:
   adapter: postgresql
   database: #{app_name}_test
   host: localhost
-  encoding: utf8  
+  encoding: utf8
 HERE
 
-puts "-----------------------------------------------------------------------"
-puts "Setup Pow"
-puts "-----------------------------------------------------------------------"
+put_header "Setup Pow"
 create_file '.powrc', <<HERE
 if [ -f "$rvm_path/scripts/rvm" ] && [ -f ".rvmrc" ]; then
   source "$rvm_path/scripts/rvm"
@@ -67,9 +60,7 @@ create_file '.rvmrc', <<HERE
 rvm 1.9.3@#{app_name}
 HERE
 
-puts "-----------------------------------------------------------------------"
-puts "Install bundles"
-puts "-----------------------------------------------------------------------"
+put_header "Install bundles"
 run "cd #{destination_root}"
 run "rvm gemset create '#{app_name}'"
 run "gem install bundler"
@@ -77,22 +68,16 @@ run "bundle install"
 
 run "ln -s #{destination_root} ~/.pow/#{app_name}"
 
-puts "-----------------------------------------------------------------------"
-puts "Setup database"
-puts "-----------------------------------------------------------------------"
+put_header "Setup database"
 rake "db:create"
 
-puts "-----------------------------------------------------------------------"
-puts "Get Skeleton"
-puts "-----------------------------------------------------------------------"
+put_header "Get Skeleton"
 run "cd app/assets/stylesheets"
 run "curl https://raw.github.com/dhgamache/Skeleton/master/stylesheets/base.css -o app/assets/stylesheets/base.css"
 run "curl https://raw.github.com/dhgamache/Skeleton/master/stylesheets/layout.css -o app/assets/stylesheets/layout.css"
 run "curl https://raw.github.com/dhgamache/Skeleton/master/stylesheets/skeleton.css -o app/assets/stylesheets/skeleton.css"
 
-puts "-----------------------------------------------------------------------"
-puts "Commit to git"
-puts "-----------------------------------------------------------------------"
+put_header "Commit to git"
 append_file '.gitignore' do
   '.DS_Store'
 end
@@ -100,12 +85,8 @@ git :init
 git :add => '.'
 git :commit => "-m 'Initial commit of Rails app for Heroku Cedar'"
 
-puts "-----------------------------------------------------------------------"
-puts "Create Heroku app"
-puts "-----------------------------------------------------------------------"
+put_header "Create Heroku app"
 run "heroku create #{app_name} --stack cedar --region eu"
 
-puts "-----------------------------------------------------------------------"
-puts "Push to Heroku"
-puts "-----------------------------------------------------------------------"
+put_header "Push to Heroku"
 run "git push heroku master"
